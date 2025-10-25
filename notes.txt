@@ -127,3 +127,144 @@ online cart microservices
 
 same for the other paths; instead of manual configuration one can use the helm charts for automatic configuration
 of k8s processes
+
+
+
+NGINX vs APACHE:
+Both used for the same functionality
+Apache started as a web serve and later extended its functionaly as a proxy
+Highly customizable ans extensible while nginx is faster and more lightweight
+apache is a good choice for dynamic content and legacy support while nginx is suited for high performance
+environments and serving static content and has a simple configuration and became more popular in the container world
+
+HANDS ON DEMO PROJECT
+What is package.json ==> this is the configuration file used in node js to manage package dependencies
+Dependencies: Lists the packages(and their versions) that the project depends on
+
+npm is node package manager for nodejs and its a tool to install, update and manage the project dependencies
+(Download the packages specified in the package.json file)
+
+node also install npm which is the package management tool for downloading those dependencies in package.json
+
+1st command: npm install => download and install the specified packages
+
+
+localhost: Refers to the current machine you are using
+Developers use localhost to simulate request to services running on their own machine
+
+dockerize the applocation and the
+=> put nginx proxy infront of our application
+
+instead of out browser hitting our express server on nodejs it will first hit the nginx server and it will
+foward the request to nodejs
+
+Containerize and start 3 instances of the application
+
+Dockerfile contains instructions(blueprint) on how to build the docker image, defining what goes into the
+image and how the container should behave when its run
+
+after building the docker image then run it specifying the port that the app will be exposed on 
+
+To start multiple images of docker, you use the docker compost yaml file
+
+To differentiate between those replicas you can pass the environment variables APP_NAME showing this 
+is replica one , two and three namings: App1, App2 and App3 and you can use this environment variable inside the
+application itself
+
+We want to see which nodejs server is handling the application and seeing the logs will be helpful
+
+The app cant run on 3 different ports on the machine thats why all the three containers are 3001, 3002, 3003 while 
+all the containers are mapped on port 3000
+
+Configure nginx proxy: to loadbalance and provide a secure connection (handle ssl encryption)
+
+capital -V wont just show you the version but lots of information about the app
+
+
+
+config file:
+worker_processes 1; 
+--> Controls how many parallel processes Nginx spawns(to cause something new, or many new things, to grow or start suddenly: 
+The new economic freedom has spawned hundreds of new small businesses.)  to handle client requests.
+
+what is worker process=> Instead of using new connection for every incoming connection , Nginx uses worker processes that
+uses many connections using a single-event threaded loop 
+
+What does the number represent:
+-> Then value is the number of processes nginx should create
+->Each worker process can run independently  and can handle its own set of connections
+
+This configuration influences how well nginx can handle traffic(performance)
+
+Note: should be tuned according to servers hardware (CPU cores) and expected traffic load
+In production process its recommended to set the worker processes to be the number of cores and allows
+nginx to efficiently use all the cores and values can be defined to auto  where nginx will decide depending on the underlying infrastructure
+
+auto=> nginx will automatically decide the number of cpu cores available on the server and starts a corresponding number of worker
+nodes
+
+worker_connections: 41:04
+
+per worker process how many simulatineous connections can be opened
+default 512
+
+events{
+	worker_processes 1024;
+}
+
+=> if you have 1 worker process you can serve 1024 clients, and double if you have 2 worker processes and so on
+
+the higher the value the more worker processes it can handle, the downside is that it increases memory usage cause you have multiple connections
+opened at the same time
+the actual connections can not exeed the current limit on the max number of open files
+
+
+Contexts:
+a few top-level directives, reffered to as contexts, group together the directives that apply to different traffic types
+events=> general connection processing
+http=> http traffic
+mail-> mail traffic
+stream=>TCP/UDP traffic
+
+directives placed outside these contexts are said to be in the main context
+http->configuration speciefic to http  and affecting all virtual servers
+
+server block: defines how nginx should handle requests for a particular domain or IP adress
+	How to litsen for connections
+	Which domain or subdomain the configuration applies to 
+	How to route the requests
+inside sever{
+	litsen=> the ip and the port on which the server will accept requests
+	server_name ->Which domain or ip adress this server block should respond to  in our example localhost;
+	
+	location / {
+		//the root(/) url, will apply all requests unless more speciefic location blocks are defined
+		proxy_pass //here you reference the upstream servers using its name and provide the protocal ie. proxy_pass nodejs_cluster
+		//tells nginx to pass the request to another server making it act as reverse proxy
+		//upstream block -> refers to the servers that nginx acts fowards the requests to 
+		//upstream name is based on the flow of data
+		//upstream servers refers to traffic going from a client towards the source or high level infrastructure, in this cas application server
+		//Downstream servers - traffic going back to the client is downstream
+		//upstream s are defined in the separare block, it defines the group of backend servers that will handle requests fowarded by nginx
+		// we want to foward info from the original client requets to the backend servers
+		// they provide useful information which backend servers which backend servers can use for logging or processing etc; original ip adresses, original host
+			reffereal information, custom headers
+
+
+
+		proxy_set_header Host $host; the request originates from nginx not the client since its the proxy so important info should reach the server
+		proxy_set_header X-realIP $remote_addr; important info for analytics security et\
+		
+	OPTIONAL:
+		We need to tell nginx to include the corresponding MIME types in the "CONTENT=TYPE" response header when sending a file, this helps the client how to 
+		process or render a file
+			
+		include mime.types; //mime.types is actually a file that nginx uses to map file extension to MIME-types
+	
+	hOW DOES NGINX decide to which server to foward the request to ; by default it will use round robbin 
+		//on top of the list of servers in upstream nodejs_cluster; you can add the routing algorithm like least_conn
+
+		Directives=> the actual instructions or commands that tell NGINX what to do 
+		Contexts=> Group of related directives that apply a certain part of the configuration
+	}
+}
