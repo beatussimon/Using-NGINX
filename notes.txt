@@ -61,3 +61,69 @@ response
 	will send the second half as you are compeleting the first half
 
 So those are the 4 functinalities of nginx web server
+
+
+CONFIGURING NGINX:
+How do you configure nginx when to work as a proxy sever and when as a webserver
+
+How do you configure sll traffic and catching etc?
+Thats where nginx.config file comes in 
+
+=> The main config file is named "nginx.config" and is usually located in "etc/nginx" folder
+=> Using custom syntax comprising Directives; Blocks
+
+You can configure if you want nginx to foward the request to other servers or itself serving files
+serving itself is an example of a simple webserver serving static files; 
+
+"location" directive defines how the server should process speciefic types of requests
+
+in the "server" you can redirect all http requests to https
+
+secondly have the https server configured to serve contents over https with ssl/tls configured
+
+It has configuration file to configure load balancing 
+
+In the example you have 3 instances of the same app running server1 to 3  all the requests are proxied
+to the server group my app1 and with in that configuration file we can define which load balancing
+algorithm to use like least_conn or use the default one which is round robbin which equally distributes the load
+in a cyclical order between those servers
+
+we have caching configuration, with with multiple different element, we also have how long the cache
+should be for its refresh and so on 
+
+-> configuration is straight fowart 
+-> granular configuration possible
+
+
+NGINX in k8s:
+Due to its abilities it became one of the k8s ingress controller functionality
+
+Ingress controller:
+is an advanced proxy with advanced load balancing functionalities in k8s 
+A specialized load balancer for managing ingress(incoming) traffic in k8s 
+
+Now what nginx was doing for simple sites it is doing fo k8s
+=-> it handles the routing to the appropriate services based on rules defined in an ingress resource
+
+and fowards to the right service in the cluster
+
+this load balancing configuration is very advanced and speciefic to k8s but the idea is pretty much the
+same(videos on nana's channel on how to configure it)
+
+There are many configurations but nginx isvery popular for k8s
+
+Wha about cloud's load balancer
+
+The usage in cloud situations it is used for internal purposes and the cloud's native load balancer 
+will be the one accesible in the external communications
+
+the cloud lb will foward the requests to the ingress controller, this adds extra layer of security 
+as the cluster is never exposed to public access and the request from cloud's lb will be fowarded to 
+the ingress controller and it will route the traffic based on the intelligent logic to different applications
+with in the cluster
+
+Intelligent routing based on path and host matching; For instance /online-cart will route traffic to 
+online cart microservices
+
+same for the other paths; instead of manual configuration one can use the helm charts for automatic configuration
+of k8s processes
