@@ -268,3 +268,82 @@ inside sever{
 		Contexts=> Group of related directives that apply a certain part of the configuration
 	}
 }
+
+
+
+
+
+
+CONFIGURING SSL/TLS SECURE CONNECTION;
+	step01: obtain the ssl/tls certificate:
+ssl certificates enable encryption by using public key cryptography
+=>When a user connects to a website via HTTPs, the web server provides its SSl certificates which contains a public key
+	The client(browser) uses this key to establish a secure, encrypted session with the server
+=> We can generate the self-signed by the server itseif; useful fot testing or internal sites  but not recommended for production
+
+CA-assigned certificate=> issued and authenticated by a trusted certificate authority
+			=> CA verifies the identity of the organization requesting the certificate
+
+			=> Trusted by the browsers 
+
+
+make a directory then go to the directory and run this command:
+	open ssl req -x509 -nodes -days	365 -newkey rsa:2048 keyout nginx-selfsigned.key -out nginx-selfsigned.crt
+
+breakdown:
+openssl req -> Initiate a certificate generation process
+-x509 => Tells OpenSSL to output a certificate in this standard certificate format
+-nodes -> tells OpenSSL not to encrypt the private key with a pass phrase\
+-days 365 =. specifies the validity period of the certificate in this case; 1 year
+-newkey rsa:2048 => creates a 2048 bit RSA key pair
+	RSA=> most commpn public key encryption algorithm
+
+
+
+-keyout nginx-selfsigned.key ==> specifies the output file for the generated key
+ in this case "nginx-selfsigned.key"
+-keyout nginx-selfsigned.key ==> specifies the output file for self signed certificate	 in this case "nginx-selfsigned.crt"
+
+
+
+Private key: must be kept secret and never shared publicly
+	used to decrypt data
+
+Public key: shared with clients to encrypt data
+
+You will then provide some additional info and the files for public key and private key will be generated
+
+
+CONFIGURING NGIX TO USE THOSE CERTIFICATES:
+configure the server to litsen to 443;
+This is the standard port for https traffic enabling ssl for secure communication
+
+
+litsen 443 ssl;
+ssl_certificate
+ssl_certificate_key
+and provide the location of those certificates
+pwd then copy paste
+
+restart nginx and run it again
+
+You can configure that if our client tries to access the http version they are redirected to the https version
+
+server{
+	litsen 8080;
+	server_name localhost;
+
+	location / {
+		return 301 https://$host$request_uri;
+	}
+}
+
+301=> Redirects the client(browser) to HTTPS using 301 status code which indicates a permanent redirect
+
+to see nginx command help
+command: nginx -h
+
+to reload:
+command: nginx -s reload
+
+80 is the default local host
