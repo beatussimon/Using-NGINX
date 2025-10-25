@@ -1,0 +1,63 @@
+NGINX:
+The piece of software that runs on a server machine
+and can repond to requests on a browser
+
+the same nginx has a load balancer that proxies to those 
+other nginx web servers
+
+proxy means to do something on someone elses behalf
+
+So it accepts the requests on behalf of web servers and distributes
+the load to the web servers. How? that depends on the algorithm the it
+was configured on; it could be a simple logic like the least busy server
+, round robbin(distributes the requests in a cyclic manner)
+
+The same nginx server can perform multiple tasks;
+
+caching: 
+do the heavy lifting once and
+-> store the response
+This is another feature of nginx proxy
+--> caches the responses from the backend server for frequently 
+accesed resources
+--->Copies and stores temporarily to improve performance
+
+
+Exposing all servers to public acess
+-> increased surface attack; each publicly exposed server represents
+an entry point attackers can target
+-> You will have to secure every server(headache)
+
+Instead we just give them 1 server that is publically available; hence:
+=> consolidate security
+-> minimize exposure
+=> centralize access control
+=> centralized monitoring and logging	
+
+Using ngix proxy significantly reduces attack surface
+and will act as a shield before all those servers
+
+
+About security 1 important metric is encrypted communication
+So frontend will send encrypted communication to the proxy that 
+means even if attacker intercepts the message then cant read it 
+and only the proxy server can decrypt it 
+
+Better: Nginx fowards the encrypted messages to the web servers and the
+server will decrypt it itself
+
+It enforces Https; accepts encrypted traffic and denies unencrypted 
+requests
+
+
+Imagine netflix usage by people in ny concurrently requsting for hq videos; nginx can compress the 
+response
+=> to reduce the bandwith usage and improve load times; both to the side receiving and the side 
+	sending those files; hence arrives faster and reduces your internet bandwith
+=> Supports segmentation meaning sending responses in chunks
+	breaks the file into chunks(video streaming)
+
+	It will send first half of the video and by the time you have watched the first half it 
+	will send the second half as you are compeleting the first half
+
+So those are the 4 functinalities of nginx web server
